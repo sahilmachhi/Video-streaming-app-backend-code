@@ -1,0 +1,25 @@
+{
+  "name": "video-streaming-app-backend-code",
+  "version": "1.0.0",
+  "description": "video streaming backend project made with mongoDB and express.js",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon src/index.js"
+  },
+  "keywords": [
+    "javascript",
+    "mongoDB",
+    "backend",
+    "express.js"
+  ],
+  "author": "Sahil M",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "mongoose": "^8.5.1",
+    "nodemon": "^3.1.4",
+    "prettier": "^3.3.3"
+  }
+}
