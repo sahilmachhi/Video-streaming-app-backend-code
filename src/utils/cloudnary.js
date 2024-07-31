@@ -1,18 +1,25 @@
-// import {v2 } from "cloundinary"
+import { v2 as cloudinary } from 'cloudinary';
 import fs from "fs"
 
 
-v2.config({
-    cloud_name: "",
-    api_key: "api_key",
-    api_seceret: "",
-})
+
+cloudinary.config({
+    cloud_name: process.evn.CLOUD_NAME,
+    api_key: process.evn.CLOUDINARY_API_KEY,
+    api_secret: process.evn.CLOUDINARY_API_SECRET
+});
 
 export const uoloadOnCloudinary = async (uploadUrl) => {
     try {
         if (!uploadUrl) return null
-        console.log(uploadUrl)
+        const uploadResult = await cloudinary.uploader
+            .upload(
+                'https://res.cloudinary.com/demo/image/upload/getting-started/shoes.jpg', {
+                public_id: 'avatar',
+            })
+        console.log(uploadResult.url)
+
     } catch (error) {
-        console.log("upload failed: ", error)
+        fs.unlinkSync(uploadUrl)
     }
 }
