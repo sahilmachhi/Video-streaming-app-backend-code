@@ -1,5 +1,12 @@
-import asyncHandler from "../middleware/asyncHandler"
+import { asyncHandler } from "../utils/asyncHandler.js";
+
 export const registerUser = asyncHandler(async (req, res) => {
-    console.log(asyncHandler)
+    const { username, email, fullname, coverImage, avatar, watchHistory, password, refreshToken } = req.body
+
+    console.log({ email: email })
+
+    res.status(200).json({ email: email })
 })
+
+
 
