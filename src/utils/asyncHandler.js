@@ -3,7 +3,7 @@ export const asyncHandler = (fn) => {
         try {
             await fn(req, res, next)
         } catch (error) {
-            res.send(500).json({
+            res.sendStatus(500).json({
                 success: false,
                 message: error
             })
