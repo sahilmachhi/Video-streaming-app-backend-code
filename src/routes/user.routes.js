@@ -7,6 +7,7 @@ export const userRoutes = Router()
 
 
 userRoutes.post("/user", upload.fields([
+
     {
         name: "avatar",
         maxCount: 1
