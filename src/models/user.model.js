@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const userSchema = new mongoose.Schema({
     username: {
@@ -18,14 +18,14 @@ const userSchema = new mongoose.Schema({
     },
     avatar: {
         type: String, //cloudinary url
-        required: true,
+        // required: true,
     },
     coverImage: {
         type: String, //cloudinary url
     },
     watchHistory: [
         {
-            type: Schema.Types.ObjectId,
+            type: mongoose.Schema.Types.ObjectId,
             ref: "Video"
         }
     ],
@@ -36,6 +36,6 @@ const userSchema = new mongoose.Schema({
     refreshToken: {
         type: String
     }
-}, { timestamps: True })
+}, { timestamps: true })
 
 export const User = mongoose.model("User", userSchema)
