@@ -1,29 +1,11 @@
-// import { asyncHandler } from "../utils/asyncHandler.js";
 import { User } from "../models/user.model.js";
-// import { uoloadOnCloudinary } from "../utils/cloudnary.js";
+import { uploadOnCloudinary } from "../utils/cloudnary.js";
 
 
-// export const registerUser = asyncHandler(async (req, res) => {
-//     const { username, email, fullname, coverImage, avatar, watchHistory, password, refreshToken } = req.body
-
-
-//     if (username === "" || email === "" || fullname === "" || password === "") {
-//         throw new console.error("error in product fetch: ", error)
-//         res.status(404).json({ success: false, message: "Product fetch failed" })
-//     } else {
-//         // res.status(200).json({ email: email })
-
-//     }
-// })
 
 export const registerUser = async (req, res) => {
-    debugger
     try {
-        // const data = req.body
-        const { username, email, fullname, password } = req.body
-
-        console.log(`here is postman data: ${(data)}`)
-
+        const { username, email, fullname, password } = req.body;
 
         if (!username || !email || !password || !fullname) {
             console.log("error in username")
@@ -37,8 +19,6 @@ export const registerUser = async (req, res) => {
             $or: [{ email }, { username }]
         })
 
-        console.log(existingUser)
-
         if (existingUser) {
             return res.status(409).json({
                 success: false,
@@ -46,33 +26,36 @@ export const registerUser = async (req, res) => {
             })
         }
 
-        // const avatarLocalPath = req.files?.avatar[0]?.path
-        // const coverImageLocalPath = req.files?.coverImage[0]?.path
+        const avatarLocalPath = req.files.avatar[0].path;
+        let coverImageLocalPath;
 
-        // if (!avatarLocalPath) {
-        //     res.status(400).json({
-        //         success: false
-        //         , message: "avatar file is required"
-        //     })
-        // }
+        if (req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length > 0) coverImageLocalPath = req.files?.coverImage[0]?.path;
 
-        // const avatar = await uoloadOnCloudinary(avatarLocalPath)
-        // const coverImage = await uoloadOnCloudinary(coverImageLocalPath)
 
-        // if (!avatar) {
-        //     res.status(400).json({
-        //         success: false
-        //         , message: "avatar file is required"
-        //     })
-        // }
+        if (!avatarLocalPath) {
+            res.status(400).json({
+                success: false
+                , message: "avatar file is required"
+            })
+        }
+
+        const avatar = await uploadOnCloudinary(avatarLocalPath)
+        const coverImage = await uploadOnCloudinary(coverImageLocalPath)
+
+        if (!avatar) {
+            res.status(400).json({
+                success: false
+                , message: "failed to find on localpath"
+            })
+        }
 
         const user = await User.create({
             fullname,
             email,
             username,
             password,
-            // coverImage: coverImage?.url || "",
-            // avatar: avatar.url
+            coverImage: coverImage || "",
+            avatar: avatar
         })
 
         if (!user) {
@@ -89,6 +72,3 @@ export const registerUser = async (req, res) => {
         return res.status(404).json({ success: false, message: "server error" })
     }
 }
-
-
-

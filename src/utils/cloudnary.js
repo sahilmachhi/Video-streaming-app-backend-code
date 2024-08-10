@@ -1,5 +1,6 @@
 import { v2 as cloudinary } from 'cloudinary';
 import fs from "fs"
+import { fs } from "fs"
 
 
 
@@ -9,16 +10,16 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-export const uoloadOnCloudinary = async (uploadUrl) => {
+export const uploadOnCloudinary = async (uploadUrl) => {
+    debugger
     try {
         if (!uploadUrl) return null
         const uploadResult = await cloudinary.uploader
             .upload(
-                'https://res.cloudinary.com/demo/image/upload/getting-started/shoes.jpg', {
-                public_id: 'avatar',
-            })
-        console.log(uploadResult.url)
-
+                uploadUrl
+            )
+        console.log(uploadUrl)
+        return uploadResult.url
     } catch (error) {
         fs.unlinkSync(uploadUrl)
     }

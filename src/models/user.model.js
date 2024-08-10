@@ -1,4 +1,5 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose from "mongoose"
+
 
 const userSchema = new mongoose.Schema({
     username: {
@@ -18,7 +19,7 @@ const userSchema = new mongoose.Schema({
     },
     avatar: {
         type: String, //cloudinary url
-        // required: true,
+        required: true,
     },
     coverImage: {
         type: String, //cloudinary url
