@@ -4,6 +4,7 @@ import { uploadOnCloudinary } from "../utils/cloudnary.js";
 
 
 export const registerUser = async (req, res) => {
+
     try {
         const { username, email, fullname, password } = req.body;
 
