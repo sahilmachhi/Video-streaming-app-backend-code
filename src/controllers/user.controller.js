@@ -4,7 +4,6 @@ import { uploadOnCloudinary } from "../utils/cloudnary.js";
 
 
 export const registerUser = async (req, res) => {
-
     try {
         const { username, email, fullname, password } = req.body;
 
@@ -71,5 +70,50 @@ export const registerUser = async (req, res) => {
     } catch (error) {
         console.log(error)
         return res.status(404).json({ success: false, message: "server error" })
+    }
+}
+
+export const loginUser = async (req, res) => {
+    try {
+        const { email, username, password } = req.body
+
+        if (!email || !username) {
+            return res.status(405).json({
+                success: false,
+                message: "error username or email is missing from client"
+            })
+        }
+
+        if (!password) {
+            return res.status(405).json({
+                success: false,
+                message: "error password is missing from client"
+            })
+        }
+
+        const user = await User.findOne({
+            $or: [{ username }, { email }]
+        })
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "user is not found on database"
+            })
+        }
+
+        const isPasswordVaild = await user.isPasswordCorrect(password)
+
+        if (!isPasswordVaild) {
+            return res.status(406).json({
+                success: false,
+                message: "user password is not correct"
+            })
+        }
+
+
+
+    } catch (error) {
+        console.log(`server error :${error}`)
     }
 }

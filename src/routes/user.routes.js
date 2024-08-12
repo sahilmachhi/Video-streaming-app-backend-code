@@ -1,12 +1,12 @@
 import { Router } from "express";
-import { registerUser } from "../controllers/user.controller.js"
+import { registerUser, loginUser } from "../controllers/user.controller.js"
 import { upload } from "../middleware/multer.middleware.js";
 
 
 export const userRoutes = Router()
 
 
-userRoutes.post("/user",
+userRoutes.post("/user/signup",
     upload.fields([
 
         {
@@ -20,5 +20,6 @@ userRoutes.post("/user",
     ]),
     registerUser)
 
+userRoutes.post('user/login', loginUser)
 
 
