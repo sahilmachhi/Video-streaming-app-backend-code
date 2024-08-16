@@ -1,7 +1,24 @@
 import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudnary.js";
 
+const generateAccessTokenAndRefreshToken = async (userId) => {
+    console.log(userId)
+    debugger
+    try {
+        const user = await User.findById(userId)
+        console.log(user)
+        const accessToken = await user.generateAccessToken()
+        const refreshToken = await user.generateRefreshToken()
 
+        user.refreshToken = refreshToken
+        await user.save({ validateBeforeSave: true })
+
+        return { accessToken, refreshToken }
+
+    } catch (error) {
+        console.log(error)
+    }
+}
 
 export const registerUser = async (req, res) => {
     try {
@@ -74,10 +91,11 @@ export const registerUser = async (req, res) => {
 }
 
 export const loginUser = async (req, res) => {
+    debugger
     try {
         const { email, username, password } = req.body
 
-        if (!email || !username) {
+        if (!email && !username) {
             return res.status(405).json({
                 success: false,
                 message: "error username or email is missing from client"
@@ -91,9 +109,11 @@ export const loginUser = async (req, res) => {
             })
         }
 
-        const user = await User.findOne({
+        let user = await User.findOne({
             $or: [{ username }, { email }]
         })
+
+        console.log(`database user: ${user}`)
 
         if (!user) {
             return res.status(404).json({
@@ -108,12 +128,70 @@ export const loginUser = async (req, res) => {
             return res.status(406).json({
                 success: false,
                 message: "user password is not correct"
+
             })
         }
+        console.log(user._id)
+        const { accessToken, refreshToken } = await generateAccessTokenAndRefreshToken(user._id.toString())
 
+
+        const fieldsToDelete = ["password", "refreshToken"];
+
+        fieldsToDelete.forEach(function (field) {
+            delete user[field];
+        });
+
+        const options = {
+            httpOnly: true,
+            secure: true
+        }
+
+        return res.status(200).cookie("accessToken", accessToken, options).cookie("refreshToken", refreshToken, options).json({
+            success: true,
+            data: user,
+            accessToken: accessToken,
+            refreshToken: refreshToken
+        })
 
 
     } catch (error) {
-        console.log(`server error :${error}`)
+        return res.status(405).json({
+            success: false,
+            message: "failed from database"
+        })
+    }
+}
+
+export const logoutUser = async (req, res) => {
+    try {
+        const user = req.body
+
+        await User.findByIdAndUpdate(
+            user._id.toString(), {
+            $set: {
+                refreshToken: undefined
+            }
+        },
+            {
+                new: true
+            }
+        )
+
+        const options = {
+            httpOnly: true,
+            secure: true
+        }
+
+        return res.status(200).clearCookie("accessToken", options).clearCookie("refreshToken", options).json(
+            {
+                success: true,
+                message: "user loggedout successfully"
+            }
+        )
+    } catch (error) {
+        return res.status(405).json({
+            success: false,
+            message: "error in logout user"
+        })
     }
 }

@@ -1,6 +1,7 @@
 import { Router } from "express";
-import { registerUser, loginUser } from "../controllers/user.controller.js"
+import { registerUser, loginUser, logoutUser } from "../controllers/user.controller.js"
 import { upload } from "../middleware/multer.middleware.js";
+import { verifyJWT } from "../middleware/auth.middleware.js";
 
 
 export const userRoutes = Router()
@@ -20,6 +21,6 @@ userRoutes.post("/user/signup",
     ]),
     registerUser)
 
-userRoutes.post('user/login', loginUser)
+userRoutes.post("/user/login", loginUser)
 
-
+userRoutes.post("/user/logout", verifyJWT, logoutUser)
