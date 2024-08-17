@@ -1,5 +1,6 @@
 import { User } from "../models/user.model.js";
 import { uploadOnCloudinary } from "../utils/cloudnary.js";
+import jwt from "jsonwebtoken"
 
 const generateAccessTokenAndRefreshToken = async (userId) => {
     console.log(userId)
@@ -194,4 +195,58 @@ export const logoutUser = async (req, res) => {
             message: "error in logout user"
         })
     }
+}
+
+export const refreshAccessToken = async (req, res) => {
+    try {
+
+        const incomingAccessToken = req.cookies.refreshToken || req.body.refreshToken
+
+        if (!incomingAccessToken) {
+            return res.status(401).json({
+                success: false,
+                message: "error accessing refreshToken"
+            })
+        }
+
+        const decodedToken = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET)
+
+        const user = await User.findById(decodedToken.id.toString())
+
+        if (!user) {
+            return res.status(401).json({
+                success: false,
+                message: "error user not found"
+            })
+        }
+
+        if (decodedToken !== user?.refreshToken) {
+            return res.status(401).json({
+                success: false,
+                message: "refreshToken is expired or used somewhere else"
+            })
+        }
+
+    } catch (error) {
+        return res.status(405).json({
+            success: false,
+            message: "error in generating AccessToken"
+        })
+    }
+
+    const options = {
+        httpOnly: true,
+        secure: true
+    }
+
+    const { accessToken, newRefreshToken } = generateAccessTokenAndRefreshToken(user._id.toString())
+
+    return res.status(200).cookie("accessToken", accessToken, options).cookie("refreshToken", newRefreshToken, options).json({
+        success: true,
+        accessToken: accessToken,
+        refreshToken: newRefreshToken,
+        message: "accessToken refreshed successfully"
+    })
+
+
 }
